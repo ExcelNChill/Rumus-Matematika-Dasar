@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tutorial Excel Animasi Interaktif</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Calibri, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f5f5f5; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .container { width: 100%; max-width: 900px; background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        
+        .header { margin-bottom: 25px; border-bottom: 2px solid #217346; padding-bottom: 15px; }
+        .header h1 { color: #217346; font-size: 24px; margin-bottom: 8px; }
+        .header p { color: #555; font-size: 15px; line-height: 1.5; }
+
+        .xl { border: 1px solid #b0b0b0; border-radius: 6px; overflow: hidden; background: #fff; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .tbar { padding: 8px 14px; display: flex; align-items: center; gap: 10px; }
+        .macs { display: flex; gap: 6px; }
+        .mac { width: 12px; height: 12px; border-radius: 50%; }
+        .tbar-t { color: #fff; font-size: 13px; font-weight: 500; letter-spacing: 0.5px; }
+        .ribbon { background: #f3f9f5; border-bottom: 1px solid #c8dfc8; padding: 5px 10px; display: flex; gap: 15px; }
+        .rb { font-size: 12px; color: #1a5c33; padding: 4px 8px; border-radius: 3px; cursor: default; transition: background 0.2s; }
+        .rb:hover { background: #e2f0e2; }
+        .fbar { display: flex; align-items: center; border-bottom: 1px solid #d0d0d0; background: #fff; height: 30px; }
+        .nb { width: 80px; min-width: 80px; padding: 0 8px; font-family: 'Consolas', 'Courier New', monospace; font-size: 13px; color: #333; border-right: 1px solid #d0d0d0; height: 100%; display: flex; align-items: center; font-weight: bold; background: #f9f9f9; }
+        .ffx { padding: 0 12px; color: #217346; font-size: 14px; border-right: 1px solid #d0d0d0; height: 100%; display: flex; align-items: center; font-style: italic; font-weight: 700; background: #f9f9f9; }
+        .ft { flex: 1; padding: 0 12px; font-family: 'Consolas', 'Courier New', monospace; font-size: 14px; color: #111; display: flex; align-items: center; }
+        
+        .gw { position: relative; overflow: hidden; background: #e6e6e6; }
+        table { border-collapse: collapse; width: 100%; table-layout: fixed; background: #fff; }
+        .cn { width: 35px; height: 24px; background: #e0e0e0; border-right: 1px solid #c8c8c8; border-bottom: 1px solid #c8c8c8; }
+        .ch { background: #f0f0f0; border-right: 1px solid #c8c8c8; border-bottom: 1px solid #c8c8c8; text-align: center; font-size: 13px; color: #444; height: 24px; font-weight: normal; padding: 0; transition: background 0.2s, color 0.2s; }
+        .ch.hl { background: #d0e8d0; color: #1a4d2e; font-weight: bold; border-bottom: 2px solid #217346; }
+        .rn { background: #f0f0f0; border-right: 1px solid #c8c8c8; border-bottom: 1px solid #dfdfdf; font-size: 13px; color: #444; text-align: center; width: 35px; padding: 0; transition: background 0.2s, color 0.2s; }
+        .rn.hl { background: #d0e8d0; color: #1a4d2e; font-weight: bold; border-right: 2px solid #217346; }
+        .c { height: 28px; border-right: 1px solid #e0e0e0; border-bottom: 1px solid #e0e0e0; font-size: 14px; padding: 0 8px; vertical-align: middle; color: #222; background: #fff; outline: none; cursor: cell; white-space: nowrap; overflow: hidden; }
+        .c.r { text-align: right; font-family: 'Consolas', monospace; }
+        .c.hdr { background: #e8f4e8; font-weight: bold; color: #1a4d2e; text-align: center; border-bottom: 2px solid #b0d0b0; }
+        .c.lbl { color: #333; font-weight: 500; }
+        .c.tot { font-weight: bold; color: #1a5c33; background: #f0f8f0; }
+        .c.totr { font-weight: bold; color: #1a5c33; text-align: right; background: #f0f8f0; border-top: 2px solid #217346; }
+        .c.inp { background: #fffbe6; cursor: text; transition: background 0.2s; }
+        .c.inp:hover { background: #fff5c2; }
+        .c.inp:focus { outline: 2px solid #217346; outline-offset: -2px; z-index: 2; position: relative; background: #fff; box-shadow: 0 0 5px rgba(33,115,70,0.3); }
+        .c.editing { font-family: 'Consolas', 'Courier New', monospace; font-size: 14px; color: #000; text-align: left; background: #fff; padding-left: 5px; overflow: visible; position: relative; z-index: 10; }
+        
+        .xlcur { position: absolute; border: 2.5px solid #217346; pointer-events: none; z-index: 15; opacity: 0; transition: top .35s cubic-bezier(.4,0,.2,1), left .35s cubic-bezier(.4,0,.2,1), width .35s, height .35s, opacity .2s; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .xlcur::after { content: ''; position: absolute; bottom: -5px; right: -5px; width: 8px; height: 8px; background: #217346; border: 1.5px solid #fff; cursor: crosshair; }
+        .asvg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 14; }
+        .mou { position: absolute; pointer-events: none; z-index: 20; opacity: 0; transition: top .3s cubic-bezier(.4,0,.2,1), left .3s cubic-bezier(.4,0,.2,1), opacity .2s; filter: drop-shadow(1px 2px 3px rgba(0,0,0,0.3)); }
+        
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+        .bcur { display: inline-block; width: 1.5px; height: 14px; background: #000; margin-left: 2px; vertical-align: middle; animation: blink .8s step-end infinite; }
+        
+        .sbar { background: #217346; color: #fff; font-size: 12px; padding: 4px 16px; display: flex; gap: 25px; justify-content: flex-end; min-height: 24px; transition: background 0.3s; }
+        .sbar span { display: flex; align-items: center; gap: 5px; }
+        
+        .divider { margin: 25px 0; display: flex; align-items: center; gap: 12px; }
+        .divider-line { flex: 1; height: 1px; background: linear-gradient(to right, transparent, #ccc, transparent); }
+        .divider-txt { font-size: 14px; color: #555; font-weight: 600; white-space: nowrap; display: flex; align-items: center; gap: 8px; background: #f5f5f5; padding: 0 10px; border-radius: 12px; }
+        
+        .ctrl { padding: 15px; display: flex; flex-direction: column; gap: 12px; background: #f8f9fa; border-radius: 8px; border: 1px solid #e9ecef; margin-bottom: 20px; }
+        .ctrl-top { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+        
+        .btn-f { padding: 8px 12px; background: #217346; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.2s; box-shadow: 0 2px 4px rgba(33,115,70,0.2); }
+        .btn-f:hover:not(:disabled) { background: #1a5c33; transform: translateY(-1px); }
+        .btn-f:active:not(:disabled) { transform: translateY(0); box-shadow: none; }
+        .btn-f:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        .btng { padding: 8px 14px; background: #fff; color: #d83b01; border: 1px solid #d83b01; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.2s; display: flex; align-items: center; gap: 6px; margin-left: auto; }
+        .btng:hover:not(:disabled) { background: #fdf3f0; }
+        .btng:disabled { opacity: 0.5; cursor: not-allowed; border-color: #ccc; color: #888; }
+        
+        .ctrl-info { font-size: 12.5px; color: #666; display: flex; align-items: center; gap: 6px; font-style: italic; }
+        
+        .sync-dot { width: 8px; height: 8px; border-radius: 50%; background: #217346; display: inline-block; animation: pulse 2s ease-in-out infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 0.5; transform: scale(1); } 50% { opacity: 1; transform: scale(1.3); box-shadow: 0 0 8px rgba(33,115,70,0.6); } }
+
+        /* Styles for Explanation Box */
+        .explanation-box { background: #f8f9fa; border-left: 4px solid #217346; border-radius: 6px; padding: 25px; margin-top: 25px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: block; }
+        .explanation-box h3 { color: #217346; margin-bottom: 20px; font-size: 18px; display: flex; align-items: center; gap: 8px; }
+        .explanation-box h4 { color: #333; margin-top: 15px; margin-bottom: 8px; font-size: 15px; }
+        .explanation-box p, .explanation-box ul { color: #555; font-size: 14.5px; line-height: 1.6; margin-bottom: 12px; }
+        .explanation-box ul { padding-left: 22px; }
+        .explanation-box li { margin-bottom: 6px; }
+        .code-snippet { font-family: 'Consolas', 'Courier New', monospace; background: #e8f4e8; color: #155724; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 13.5px; }
+
+        @media (max-width: 768px) {
+            .container { padding: 15px; }
+            .ctrl-top { flex-direction: column; align-items: stretch; }
+            .btng { margin-left: 0; justify-content: center; }
+            .sbar { flex-wrap: wrap; justify-content: center; gap: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>Simulasi Interaktif Rumus Excel</h1>
+        <p>Pelajari 7 rumus dasar Excel secara visual. Edit nilai di workbook bawah (termasuk mengosongkan sel atau mengetik teks), lalu jalankan rumus untuk melihat perbedaannya!</p>
+    </div>
+
+    <!-- WORKBOOK ATAS (ANIMASI) -->
+    <div class="xl">
+        <div class="tbar" style="background:#217346">
+            <div class="macs"><div class="mac" style="background:#ff5f56"></div><div class="mac" style="background:#ffbd2e"></div><div class="mac" style="background:#27c93f"></div></div>
+            <span class="tbar-t">LaporanPenjualan.xlsx - Excel</span>
+        </div>
+        <div class="ribbon">
+            <span class="rb" style="background:#e2f0e2; font-weight:bold;">Beranda</span>
+            <span class="rb">Sisipkan</span>
+            <span class="rb">Tata Letak</span>
+            <span class="rb">Rumus</span>
+            <span class="rb">Data</span>
+        </div>
+        <div class="fbar">
+            <div class="nb" id="nb">A1</div>
+            <div class="ffx"><i>fx</i></div>
+            <div class="ft" id="ft"></div>
+        </div>
+        <div class="gw" id="gw">
+            <table>
+                <colgroup>
+                    <col style="width:35px">
+                    <col style="width:180px">
+                    <col style="width:120px">
+                    <col style="width:100px">
+                    <col style="width:auto">
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th class="cn"></th><th class="ch" id="chA">A</th><th class="ch" id="chB">B</th><th class="ch">C</th><th class="ch">D</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td class="rn" id="rn1">1</td><td class="c hdr">Item Penjualan</td><td class="c hdr">Kuantitas</td><td class="c"></td><td class="c"></td></tr>
+                    <tr><td class="rn" id="rn2">2</td><td class="c lbl">Laptop ASUS</td><td class="c r" id="aB2">10</td><td class="c"></td><td class="c"></td></tr>
+                    <tr><td class="rn" id="rn3">3</td><td class="c lbl">Mouse Wireless</td><td class="c r" id="aB3">25</td><td class="c"></td><td class="c"></td></tr>
+                    <tr><td class="rn" id="rn4">4</td><td class="c lbl">Keyboard Mekanikal</td><td class="c r" id="aB4"></td><td class="c"></td><td class="c"></td></tr>
+                    <tr><td class="rn" id="rn5">5</td><td class="c lbl">Monitor 24"</td><td class="c r" id="aB5">30</td><td class="c"></td><td class="c"></td></tr>
+                    <tr><td class="rn" id="rn6">6</td><td class="c lbl">Ongkos Kirim</td><td class="c r" id="aB6">Gratis</td><td class="c"></td><td class="c"></td></tr>
+                    <tr><td class="rn" id="rn7">7</td><td class="c"></td><td class="c"></td><td class="c"></td><td class="c"></td></tr>
+                    <tr><td class="rn" id="rn8">8</td><td class="c tot" id="resLbl">HASIL RUMUS</td><td class="c totr" id="aB8"></td><td class="c"></td><td class="c"></td></tr>
+                    <tr><td class="rn">9</td><td class="c"></td><td class="c"></td><td class="c"></td><td class="c"></td></tr>
+                </tbody>
+            </table>
+            <div class="xlcur" id="cur"></div>
+            <svg class="asvg">
+                <rect id="ants" fill="rgba(33,115,70,.1)" stroke="#217346" stroke-width="2" stroke-dasharray="6,4" opacity="0">
+                    <animate attributeName="stroke-dashoffset" from="0" to="-20" dur="0.5s" repeatCount="indefinite"/>
+                </rect>
+            </svg>
+            <div class="mou" id="mou">
+                <svg width="18" height="22" viewBox="0 0 16 20">
+                    <path d="M1,1 L1,16 L5,12 L7.5,18 L9.8,17 L7.2,11 L12,11 Z" fill="#000" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/>
+                </svg>
+            </div>
+        </div>
+        <div class="sbar" id="sbar">Siap</div>
+    </div>
+
+    <!-- CONTROLS -->
+    <div class="ctrl">
+        <div class="ctrl-top">
+            <button class="btn-f" onclick="runAnim('SUM')">▶ =SUM()</button>
+            <button class="btn-f" onclick="runAnim('COUNT')">▶ =COUNT()</button>
+            <button class="btn-f" onclick="runAnim('COUNTA')">▶ =COUNTA()</button>
+            <button class="btn-f" onclick="runAnim('COUNTBLANK')">▶ =COUNTBLANK()</button>
+            <button class="btn-f" onclick="runAnim('AVERAGE')">▶ =AVERAGE()</button>
+            <button class="btn-f" onclick="runAnim('MAX')">▶ =MAX()</button>
+            <button class="btn-f" onclick="runAnim('MIN')">▶ =MIN()</button>
+            
+            <button class="btng" onclick="resetAll()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+                ↺ Reset
+            </button>
+        </div>
+        <div class="ctrl-info">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#217346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+            <i>Edit nilai di workbook bawah, animasi di atas menyesuaikan otomatis.</i>
+        </div>
+    </div>
+
+    <!-- DIVIDER -->
+    <div class="divider">
+        <div class="divider-line"></div>
+        <span class="divider-txt"><span class="sync-dot"></span> Area Input Data</span>
+        <div class="divider-line"></div>
+    </div>
+
+    <!-- WORKBOOK BAWAH (INPUT) -->
+    <div class="xl" style="margin-bottom: 0;">
+        <div class="tbar" style="background:#005a9e">
+            <div class="macs"><div class="mac" style="background:#ff5f56"></div><div class="mac" style="background:#ffbd2e"></div><div class="mac" style="background:#27c93f"></div></div>
+            <span class="tbar-t">DataInput.xlsx - Mode Edit</span>
+        </div>
+        <div class="fbar">
+            <div class="nb" id="inb">B2</div>
+            <div class="ffx"><i>fx</i></div>
+            <div class="ft" id="ift">10</div>
+        </div>
+        <div class="gw">
+            <table>
+                <colgroup>
+                    <col style="width:35px">
+                    <col style="width:180px">
+                    <col style="width:120px">
+                    <col style="width:auto">
+                </colgroup>
+                <thead><tr><th class="cn"></th><th class="ch">A</th><th class="ch">B</th><th class="ch">C</th></tr></thead>
+                <tbody>
+                    <tr>
+                        <td class="rn">1</td>
+                        <td class="c hdr">Item Penjualan</td>
+                        <td class="c hdr">Kuantitas</td>
+                        <td class="c" style="font-size:12px; color:#888; font-style:italic; padding-left: 15px;">← Sel kuning bisa diedit/dihapus</td>
+                    </tr>
+                    <tr><td class="rn">2</td><td class="c lbl">Laptop ASUS</td><td class="c r inp" id="i2" contenteditable="true" spellcheck="false">10</td><td class="c"></td></tr>
+                    <tr><td class="rn">3</td><td class="c lbl">Mouse Wireless</td><td class="c r inp" id="i3" contenteditable="true" spellcheck="false">25</td><td class="c"></td></tr>
+                    <tr><td class="rn">4</td><td class="c lbl">Keyboard Mekanikal</td><td class="c r inp" id="i4" contenteditable="true" spellcheck="false"></td><td class="c"></td></tr>
+                    <tr><td class="rn">5</td><td class="c lbl">Monitor 24"</td><td class="c r inp" id="i5" contenteditable="true" spellcheck="false">30</td><td class="c"></td></tr>
+                    <tr><td class="rn">6</td><td class="c lbl">Ongkos Kirim</td><td class="c r inp" id="i6" contenteditable="true" spellcheck="false">Gratis</td><td class="c"></td></tr>
+                    <tr><td class="rn">7</td><td class="c"></td><td class="c"></td><td class="c"></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- EXPLANATION SECTION -->
+    <div class="explanation-box" id="explainBox">
+        <h3>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+            <span id="expTitle">Silakan pilih rumus di atas</span>
+        </h3>
+        <div id="expContent">
+            <p>Pilih salah satu tombol rumus (SUM, COUNT, dll) untuk melihat animasi simulasi dan cara kerja masing-masing fungsinya.</p>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    const gw = document.getElementById('gw');
+    const dataRows = ['2','3','4','5','6'];
+
+    const explanations = {
+        'SUM': {
+            title: 'Mengenal Fungsi SUM',
+            content: `
+                <h4>1. Syntax dari Rumus</h4>
+                <p><span class="code-snippet">=SUM(B2:B6)</span></p>
+                <h4>2. Rumus ini digunakan untuk apa?</h4>
+                <p><strong>SUM</strong> digunakan untuk <strong>menjumlahkan</strong> seluruh nilai <strong>angka</strong> di dalam rentang sel yang dipilih. Sel yang kosong atau berisi teks otomatis diabaikan.</p>
+                <h4>3. Gimana cara kerja dan cara pakenya?</h4>
+                <p>Ketik <span class="code-snippet">=SUM(</span>, lalu seret/blok (drag) kumpulan sel data yang ingin dijumlahkan (contoh B2 sampai B6). Tutup kurung lalu Enter. Excel akan langsung menghitung total keseluruhan angkanya.</p>
+            `
+        },
+        'COUNT': {
+            title: 'Mengenal Fungsi COUNT',
+            content: `
+                <h4>1. Syntax dari Rumus</h4>
+                <p><span class="code-snippet">=COUNT(B2:B6)</span></p>
+                <h4>2. Rumus ini digunakan untuk apa?</h4>
+                <p><strong>COUNT</strong> digunakan untuk menghitung <strong>berapa banyak sel yang isinya cuma ANGKA</strong>. Kalau selnya kosong atau isinya huruf/kata, dia nggak bakal ikutan dihitung.</p>
+                <h4>3. Gimana cara kerja dan cara pakenya?</h4>
+                <p>Ketik <span class="code-snippet">=COUNT(</span>, kemudian blok rentang datanya. Setelah di-Enter, Excel akan menscan satu per satu sel di range tersebut dan memberi tahu kamu jumlah kotak yang punya angka di dalamnya.</p>
+            `
+        },
+        'COUNTA': {
+            title: 'Mengenal Fungsi COUNTA',
+            content: `
+                <h4>1. Syntax dari Rumus</h4>
+                <p><span class="code-snippet">=COUNTA(B2:B6)</span></p>
+                <h4>2. Rumus ini digunakan untuk apa?</h4>
+                <p><strong>COUNTA</strong> (singkatan dari <em>Count All</em>) digunakan untuk menghitung <strong>semua sel yang TIDAK kosong (ada isinya)</strong>. Bebas apakah isinya angka, huruf, teks, atau simbol, yang penting nggak bolong.</p>
+                <h4>3. Gimana cara kerja dan cara pakenya?</h4>
+                <p>Ketik <span class="code-snippet">=COUNTA(</span>, blok area datanya, lalu Enter. Rumus ini cocok banget dipake kalau kamu mau ngecek "sudah berapa baris data sih yang udah diinput?".</p>
+            `
+        },
+        'COUNTBLANK': {
+            title: 'Mengenal Fungsi COUNTBLANK',
+            content: `
+                <h4>1. Syntax dari Rumus</h4>
+                <p><span class="code-snippet">=COUNTBLANK(B2:B6)</span></p>
+                <h4>2. Rumus ini digunakan untuk apa?</h4>
+                <p>Sesuai namanya, <strong>COUNTBLANK</strong> cuma akan menghitung sel-sel yang <strong>benar-benar KOSONG (blank)</strong> di dalam range data yang kamu pilih.</p>
+                <h4>3. Gimana cara kerja dan cara pakenya?</h4>
+                <p>Ketik <span class="code-snippet">=COUNTBLANK(</span>, sorot data yang mau dicek, dan tekan Enter. Excel bakal mendeteksi dan menjumlahkan kotak-kotak mana aja yang masih belum diisi. Cocok buat nyari data yang kelewat!</p>
+            `
+        },
+        'AVERAGE': {
+            title: 'Mengenal Fungsi AVERAGE',
+            content: `
+                <h4>1. Syntax dari Rumus</h4>
+                <p><span class="code-snippet">=AVERAGE(B2:B6)</span></p>
+                <h4>2. Rumus ini digunakan untuk apa?</h4>
+                <p><strong>AVERAGE</strong> digunakan untuk mencari <strong>nilai rata-rata</strong> dari sekumpulan angka. Daripada ngitung total (SUM) terus dibagi manual (COUNT), rumus ini bikin semuanya otomatis.</p>
+                <h4>3. Gimana cara kerja dan cara pakenya?</h4>
+                <p>Ketik <span class="code-snippet">=AVERAGE(</span>, pilih range angkanya, lalu Enter. Excel akan menjumlahkan semua angka secara diam-diam, lalu ngebaginya dengan jumlah sel yang ada angkanya buat ngasih nilai rata-rata ke kamu.</p>
+            `
+        },
+        'MAX': {
+            title: 'Mengenal Fungsi MAX',
+            content: `
+                <h4>1. Syntax dari Rumus</h4>
+                <p><span class="code-snippet">=MAX(B2:B6)</span></p>
+                <h4>2. Rumus ini digunakan untuk apa?</h4>
+                <p><strong>MAX</strong> (Maximum) digunakan untuk mencari dan menampilkan nilai <strong>angka TERBESAR</strong> atau tertinggi dari sekumpulan data.</p>
+                <h4>3. Gimana cara kerja dan cara pakenya?</h4>
+                <p>Ketik <span class="code-snippet">=MAX(</span>, blok kumpulan datanya, lalu tekan Enter. Excel akan membandingkan seluruh angka yang ada di area tersebut dan otomatis memunculkan angka jawara yang paling gede.</p>
+            `
+        },
+        'MIN': {
+            title: 'Mengenal Fungsi MIN',
+            content: `
+                <h4>1. Syntax dari Rumus</h4>
+                <p><span class="code-snippet">=MIN(B2:B6)</span></p>
+                <h4>2. Rumus ini digunakan untuk apa?</h4>
+                <p>Kebalikan dari MAX, fungsi <strong>MIN</strong> (Minimum) digunakan untuk mencari dan menampilkan nilai <strong>angka TERKECIL</strong> atau nilai paling bawah dari sebuah rentang data.</p>
+                <h4>3. Gimana cara kerja dan cara pakenya?</h4>
+                <p>Ketik <span class="code-snippet">=MIN(</span>, blok range data, lalu Enter. Excel akan memilah dan langsung nyari angka mana yang nilainya paling kecil di antara semuanya.</p>
+            `
+        }
+    };
+
+    // Live sync: input → animation canvas
+    dataRows.forEach(n => {
+        const inp = document.getElementById('i'+n);
+        const anim = document.getElementById('aB'+n);
+        
+        inp.addEventListener('input', () => {
+            let val = inp.textContent.trim();
+            anim.textContent = val;
+            document.getElementById('ift').textContent = val;
+        });
+
+        inp.addEventListener('focus', () => {
+            document.getElementById('inb').textContent = 'B'+n;
+            document.getElementById('ift').textContent = inp.textContent.trim();
+            setTimeout(() => { document.execCommand('selectAll', false, null); }, 10);
+        });
+
+        inp.addEventListener('keydown', e => {
+            if(e.key === 'Enter') { 
+                e.preventDefault(); 
+                inp.blur(); 
+                const nextN = parseInt(n) + 1;
+                const nextInp = document.getElementById('i' + nextN);
+                if(nextInp) nextInp.focus();
+            }
+        });
+    });
+
+    function getRawData() {
+        return dataRows.map(n => document.getElementById('i'+n).textContent.trim());
+    }
+
+    function calculate(type) {
+        const raw = getRawData();
+        const nums = raw.map(v => parseFloat(v)).filter(v => !isNaN(v));
+        const blanks = raw.filter(v => v === '');
+        const nonBlanks = raw.filter(v => v !== '');
+
+        let res = 0;
+        let strRes = "0";
+
+        switch(type) {
+            case 'SUM': 
+                res = nums.reduce((a,b)=>a+b, 0); 
+                strRes = res; 
+                break;
+            case 'COUNT': 
+                res = nums.length; 
+                strRes = res; 
+                break;
+            case 'COUNTA': 
+                res = nonBlanks.length; 
+                strRes = res; 
+                break;
+            case 'COUNTBLANK': 
+                res = blanks.length; 
+                strRes = res; 
+                break;
+            case 'AVERAGE': 
+                res = nums.length ? (nums.reduce((a,b)=>a+b,0) / nums.length) : 0;
+                strRes = Math.round(res * 100) / 100; // max 2 decimal
+                break;
+            case 'MAX': 
+                res = nums.length ? Math.max(...nums) : 0; 
+                strRes = res; 
+                break;
+            case 'MIN': 
+                res = nums.length ? Math.min(...nums) : 0; 
+                strRes = res; 
+                break;
+        }
+        return { result: strRes, numCount: nums.length, total: nums.reduce((a,b)=>a+b, 0) };
+    }
+
+    // Position of a cell relative to grid wrapper
+    function cPos(id){
+        const el = document.getElementById(id);
+        const wr = gw.getBoundingClientRect();
+        const er = el.getBoundingClientRect();
+        return { t: er.top - wr.top, l: er.left - wr.left, w: er.width, h: er.height };
+    }
+
+    function moveCur(id){
+        const r = cPos(id);
+        const c = document.getElementById('cur');
+        c.style.opacity = '1';
+        c.style.top = r.t + 'px'; 
+        c.style.left = r.l + 'px';
+        c.style.width = r.w + 'px'; 
+        c.style.height = r.h + 'px';
+    }
+
+    function moveMou(id, offsetX = 0.5, offsetY = 0.5){
+        const r = cPos(id);
+        const m = document.getElementById('mou');
+        m.style.opacity = '1';
+        m.style.top = (r.t + r.h * offsetY) + 'px';
+        m.style.left = (r.l + r.w * offsetX) + 'px';
+    }
+
+    function showAnts(a, b){
+        const f = cPos(a), t = cPos(b);
+        const r = document.getElementById('ants');
+        r.setAttribute('x', f.l - 1); 
+        r.setAttribute('y', f.t - 1);
+        r.setAttribute('width', t.l + t.w - f.l + 2);
+        r.setAttribute('height', t.t + t.h - f.t + 2);
+        r.setAttribute('opacity', '1');
+    }
+
+    function hideAnts(){ 
+        document.getElementById('ants').setAttribute('opacity', '0'); 
+    }
+
+    function hlR(rows, on){ 
+        rows.forEach(r => { 
+            const e = document.getElementById('rn'+r); 
+            if(e) e.className = 'rn' + (on ? ' hl' : ''); 
+        }); 
+    }
+
+    function hlC(cols, on){ 
+        cols.forEach(c => { 
+            const e = document.getElementById('ch'+c); 
+            if(e) e.className = 'ch' + (on ? ' hl' : ''); 
+        }); 
+    }
+
+    function setFbar(cell, txt){
+        document.getElementById('nb').textContent = cell;
+        document.getElementById('ft').innerHTML = txt;
+    }
+
+    function typeInBoth(existing, append, speed, done){
+        const ft = document.getElementById('ft');
+        const b8 = document.getElementById('aB8');
+        b8.className = 'c editing';
+        let j = 0;
+        const iv = setInterval(() => {
+            if(j < append.length){
+                j++;
+                const s = existing + append.slice(0,j) + '<span class="bcur"></span>';
+                ft.innerHTML = s;
+                b8.innerHTML = s;
+            } else {
+                clearInterval(iv);
+                if(done) setTimeout(done, 150);
+            }
+        }, speed || 70);
+    }
+
+    function updateExplanation(type) {
+        if(explanations[type]) {
+            document.getElementById('expTitle').innerHTML = explanations[type].title;
+            document.getElementById('expContent').innerHTML = explanations[type].content;
+        }
+    }
+
+    let running = false, Q = 0;
+    function at(fn, d){ Q += d; setTimeout(fn, Q); }
+
+    function runAnim(type){
+        if(running) return;
+        
+        // Reset everything before starting
+        resetAll(true);
+        
+        running = true; 
+        Q = 0;
+        
+        const btns = document.querySelectorAll('.btn-f, .btng');
+        btns.forEach(b => b.disabled = true);
+
+        updateExplanation(type);
+        document.getElementById('resLbl').textContent = `HASIL ${type}`;
+
+        const b8 = document.getElementById('aB8');
+        const sbar = document.getElementById('sbar');
+        
+        sbar.innerHTML = `Menyiapkan ${type}...`;
+        sbar.style.background = '#217346';
+
+        // Get live calc
+        const calc = calculate(type);
+        const vt = getRawData();
+
+        // 1. Hover/Scan every data cell
+        at(() => { sbar.innerHTML = 'Membaca rentang data...'; }, 200);
+        
+        let dTime = 400;
+        dataRows.forEach((r, idx) => {
+            at(() => { moveMou(`aB${r}`); hlR([r],true); hlC(['B'],true); }, dTime);
+            at(() => { moveCur(`aB${r}`); setFbar(`B${r}`, vt[idx]); }, 200);
+            dTime = 400; // normal step gap
+        });
+
+        // 2. Select Result Cell (B8)
+        at(() => {
+            sbar.innerHTML = `Memilih sel hasil (B8)...`;
+            moveMou('aB8');
+            hlR(dataRows, false); hlC(['B'], false);
+            hlR([8], true); hlC(['B'], true);
+        }, 600);
+        
+        at(() => { moveCur('aB8'); setFbar('B8',''); b8.innerHTML=''; }, 300);
+
+        // 3. Type Formula prefix
+        at(() => { 
+            sbar.innerHTML = `Menulis fungsi =${type}...`;
+            typeInBoth('', `=${type}(`, 80); 
+        }, 500);
+
+        // 4. Mouse starts dragging range
+        at(() => {
+            sbar.innerHTML = 'Menyorot (drag) range data (B2:B6)...';
+            moveMou('aB2', 0.5, 0.5);
+            document.getElementById('cur').style.opacity = '0';
+            hlR([2], true);
+        }, 1200); 
+
+        // 5. Drag animation
+        dataRows.forEach((r, idx) => {
+            if(idx === 0) return; // skip B2 since already there
+            at(() => {
+                showAnts('aB2', `aB${r}`);
+                moveMou(`aB${r}`, 0.5, 0.5);
+                hlR(dataRows.slice(0, idx+1), true);
+            }, 300);
+        });
+
+        // 6. Close parenthesis
+        at(() => {
+            showAnts('aB2','aB6');
+            typeInBoth(`=${type}(`, 'B2:B6)', 60);
+        }, 400);
+
+        // 7. Hit Enter
+        at(() => {
+            sbar.innerHTML = 'Mengeksekusi rumus...';
+            hideAnts();
+            hlR(dataRows, false); 
+            hlR([8], true); hlC(['B'], true);
+            moveMou('aB8', 0.8, 0.8);
+            moveCur('aB8');
+            setFbar('B8', `=${type}(B2:B6)`);
+            
+            b8.className = 'c totr';
+            b8.style.background = '#d4edda';
+            b8.style.color = '#155724';
+            b8.textContent = calc.result;
+            
+            setTimeout(() => {
+                b8.style.transition = 'background-color 1s ease';
+                b8.style.background = '#f0f8f0';
+                b8.style.color = '#1a5c33';
+            }, 500);
+        }, 1200);
+
+        // 8. Finish & Summary
+        at(() => {
+            document.getElementById('mou').style.opacity = '0';
+            
+            let avgTxt = calc.numCount ? Math.round((calc.total / calc.numCount)*10)/10 : 0;
+            
+            sbar.innerHTML = 
+                `<span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Selesai</span>
+                 <span style="margin-left:auto;">Rata-rata: ${avgTxt}</span>
+                 <span>Angka: ${calc.numCount}</span>
+                 <span style="font-weight:bold;">Jumlah: ${calc.total}</span>`;
+            
+            running = false;
+            btns.forEach(b => b.disabled = false);
+        }, 1200);
+    }
+
+    function resetAll(isInternal = false){
+        let id = window.setTimeout(function() {}, 0);
+        while (id--) { window.clearTimeout(id); }
+
+        running = false; 
+        Q = 0;
+        
+        document.getElementById('cur').style.opacity = '0';
+        document.getElementById('mou').style.opacity = '0';
+        hideAnts();
+        
+        hlR([1,2,3,4,5,6,7,8,9], false); 
+        hlC(['A','B','C'], false);
+        
+        const b8 = document.getElementById('aB8');
+        b8.innerHTML = ''; 
+        b8.className = 'c totr'; 
+        b8.style.background = '';
+        b8.style.color = '';
+        b8.style.transition = '';
+        
+        document.getElementById('resLbl').textContent = 'HASIL RUMUS';
+        document.getElementById('sbar').innerHTML = 'Siap';
+        document.getElementById('sbar').style.background = '#217346';
+        setFbar('A1','');
+
+        if(!isInternal) {
+            document.getElementById('expTitle').innerHTML = 'Silakan pilih rumus di atas';
+            document.getElementById('expContent').innerHTML = '<p>Pilih salah satu tombol rumus (SUM, COUNT, dll) untuk melihat animasi simulasi dan cara kerja masing-masing fungsinya.</p>';
+        }
+        
+        const btns = document.querySelectorAll('.btn-f, .btng');
+        btns.forEach(b => b.disabled = false);
+    }
+</script>
+
+</body>
+</html>
